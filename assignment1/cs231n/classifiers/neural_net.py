@@ -77,7 +77,7 @@ class TwoLayerNet(object):
     #############################################################################
 
     t2 = X.dot(W1) + b1
-    t1 = t2.clip(0, np.inf)
+    t1 = t2.clip(0)
     scores = t1.dot(W2) + b2
 
     #############################################################################
@@ -107,13 +107,13 @@ class TwoLayerNet(object):
     pp[range(pp.shape[0]), y] += ys
     dsm = (-1 / ys[:, np.newaxis]) * pp
 
-    db2 = dsm
+    db2 = np.sum(dsm, axis=0)
     dW2 = t1.T.dot(dsm)
 
     dt1 = dsm.dot(W2.T)
     dt2 = (t2 > 0) * dt1
-    db1 = dt2
-    dW1 = X.T.dot(db1)
+    db1 = np.sum(dt2, axis=0)
+    dW1 = X.T.dot(dt2)
 
     # dW2 = np.zeros_like(W2)
     # db2 = np.zeros_like(b2)
@@ -229,8 +229,6 @@ class TwoLayerNet(object):
       #########################################################################
 
       self.params['W1'] -= learning_rate * grads['W1']
-      print(self.params['b1'].shape)
-      print(grads['b1'].shape)
       self.params['b1'] -= learning_rate * grads['b1']
       self.params['W2'] -= learning_rate * grads['W2']
       self.params['b2'] -= learning_rate * grads['b2']
