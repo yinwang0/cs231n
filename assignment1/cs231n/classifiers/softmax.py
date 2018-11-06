@@ -85,9 +85,13 @@ def softmax_loss_vectorized(W, X, y, reg):
   ys = ps2[range(ps2.shape[0]), y]
   loss += - np.sum(np.log(ys))
 
-  pp = - ps2 * ys[:, np.newaxis]
-  pp[range(pp.shape[0]), y] += ys
-  dsm = (-1 / ys[:, np.newaxis]) * pp
+  # pp = - ps2 * ys[:, np.newaxis]
+  # pp[range(pp.shape[0]), y] += ys
+  # dsm = (-1 / ys[:, np.newaxis]) * pp
+
+  dsm = ps2.copy()
+  dsm[range(ps2.shape[0]), y] -= 1
+
   dW = X.T.dot(dsm)
 
   # for i in range(num_train):

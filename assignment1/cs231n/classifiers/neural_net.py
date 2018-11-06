@@ -77,7 +77,7 @@ class TwoLayerNet(object):
     #############################################################################
 
     t2 = X.dot(W1) + b1
-    t1 = t2.clip(0)
+    t1 = np.maximum(0, t2)
     scores = t1.dot(W2) + b2
 
     #############################################################################
@@ -103,9 +103,12 @@ class TwoLayerNet(object):
     ys = ps[range(ps.shape[0]), y]
     loss += - np.sum(np.log(ys))
 
-    pp = - ps * ys[:, np.newaxis]
-    pp[range(pp.shape[0]), y] += ys
-    dsm = (-1 / ys[:, np.newaxis]) * pp
+    # pp = - ps * ys[:, np.newaxis]
+    # pp[range(pp.shape[0]), y] += ys
+    # dsm = (-1 / ys[:, np.newaxis]) * pp
+
+    dsm = ps.copy()
+    dsm[range(ps.shape[0]), y] -= 1
 
     db2 = np.sum(dsm, axis=0)
     dW2 = t1.T.dot(dsm)
@@ -199,6 +202,8 @@ class TwoLayerNet(object):
     loss_history = []
     train_acc_history = []
     val_acc_history = []
+
+    cache = 0
 
     for it in range(num_iters):
       X_batch = None
