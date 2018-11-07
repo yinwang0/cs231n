@@ -316,17 +316,14 @@ class FullyConnectedNet(object):
             if i == self.num_layers - 1:
                 cache1 = cache[i]
                 di, dw2, db2 = affine_backward(di, cache1)
-
                 grads['W' + str(i)] = dw2 + (self.reg * Wi)
                 grads['b' + str(i)] = db2 + (self.reg * bi)
             else:
                 (cache1, cache2) = cache[i]
                 dx = relu_backward(di, cache2)
                 di, dw2, db2 = affine_backward(dx, cache1)
-
                 grads['W' + str(i)] = dw2 + (self.reg * Wi)
                 grads['b' + str(i)] = db2 + (self.reg * bi)
-
 
         ############################################################################
         #                             END OF YOUR CODE                             #
