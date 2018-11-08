@@ -277,7 +277,7 @@ def batchnorm_backward(dout, cache):
         d2 = (1 - dmean) / np.sqrt(var + eps)
         dnorm[j] = d1 + d2
 
-    dx = gamma * dnorm
+    dx = gamma * dout * dnorm
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
