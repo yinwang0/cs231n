@@ -250,7 +250,9 @@ def batchnorm_backward(dout, cache):
 
     mean = np.mean(x, axis=0)
     var = np.mean((x - mean) ** 2, axis=0)
-    norm = (x - mean) / np.sqrt(var + eps)
+
+    vare = var + eps
+    norm = (x - mean) / np.sqrt(vare)
 
     dgamma = np.sum(norm * dout, axis=0)
     dbeta = np.sum(dout, axis=0)
@@ -273,9 +275,10 @@ def batchnorm_backward(dout, cache):
 
         dvar = total / N
 
-        dsig = -1 / (2 * np.power(var + eps, 3/2)) * dvar
-        d1 = (x[j] - mean) * dsig
-        d2 = (1 - dmean) / np.sqrt(var + eps)
+        # dsig = -1 / (2 * np.power(var + eps, 3/2)) * dvar
+        # d1 = (x[j] - mean) * dsig
+        d1 = norm[j] * (- dvar / (2 * vare))
+        d2 = (1 - dmean) / np.sqrt(vare)
         dnorm[j] = d1 + d2
 
     dx = gamma * dout * dnorm

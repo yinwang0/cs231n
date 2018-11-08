@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="59574ffc-5aa0-4837-93c8-1300ce69436c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../assignment2/BatchNormalization.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/BatchNormalization.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../assignment2/cs231n/layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/cs231n/layers.py" afterDir="false" />
     </list>
