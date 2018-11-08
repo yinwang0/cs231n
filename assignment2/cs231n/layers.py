@@ -186,7 +186,16 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # Referencing the original paper (https://arxiv.org/abs/1502.03167)   #
         # might prove to be helpful.                                          #
         #######################################################################
-        pass
+        mean = np.mean(x, axis=0)
+        var = np.mean((x - mean) ** 2, axis=0)
+        running_mean = momentum * running_mean + (1 - momentum) * mean
+        running_var = momentum * running_var + (1 - momentum) * var
+
+        norm = (x - mean) / np.sqrt(var + eps)
+        out = gamma * norm + beta
+
+        cache = (x, norm, gamma, var, mean, eps)
+
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
@@ -197,7 +206,9 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # then scale and shift the normalized data using gamma and beta.      #
         # Store the result in the out variable.                               #
         #######################################################################
-        pass
+        norm = (x - running_mean) / np.sqrt(running_var + eps)
+        out = gamma * norm + beta
+
         #######################################################################
         #                          END OF YOUR CODE                           #
         #######################################################################
@@ -235,7 +246,34 @@ def batchnorm_backward(dout, cache):
     # Referencing the original paper (https://arxiv.org/abs/1502.03167)       #
     # might prove to be helpful.                                              #
     ###########################################################################
-    pass
+    (x, norm, gamma, var, mean, eps) = cache
+    dgamma = np.sum(norm * dout, axis=0)
+    dbeta = np.sum(dout, axis=0)
+
+    N = x.shape[0]
+    dnx = np.zeros_like(x)
+
+    for j in range(N):
+        dmean = np.ones_like(x[j]) / N
+        d1 = np.ones_like(x[j]) - dmean
+
+        s = 0
+        for i in range(N):
+            if i == j:
+                s += 2 * (x[i] - mean) * (1 - dmean)
+            else:
+                s += 2 * (x[i] - mean) * (- dmean)
+
+        dvar = 1 / N * s
+        dnx[j] = (x[j] - mean) * (-1/(2 * np.power(var + eps, 3/2))) * dvar + d1 / (np.sqrt(var + eps))
+
+    # dmean = np.ones_like(x) * ((N - 1) / N)
+    # dvar = 0
+    # dsq = 1 / (2 * sq) * dvar
+    # dnx = (x - mean) * (-1 / (2 * np.power(sq, 3/2)) * dsq) + (1 - dmean) / sq
+
+    dx = gamma * dnx
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
