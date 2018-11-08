@@ -265,17 +265,15 @@ def batchnorm_backward(dout, cache):
     #     dv += 2 * (x[i] - mean) * (- dmean)
 
     for j in range(N):
-        # dv += 2 * (x[j] - mean)
-        dv = 0
+        # dv2 = dv + 2 * (x[j] - mean)
+
+        total = 0
         for i in range(N):
-            if i == j:
-                dv += 2 * (x[i] - mean) * (1 - dmean)
-            else:
-                dv += 2 * (x[i] - mean) * (- dmean)
+            total += 2 * (x[i] - mean) * ((i == j) - dmean)
 
-        dvar = dv / N
+        dvar = total / N
 
-        d1 = (x[j] - mean) * (-1/(2 * np.power(var + eps, 3/2))) * dvar
+        d1 = - (x[j] - mean) / (2 * np.power(var + eps, 3/2)) * dvar
         d2 = (1 - dmean) / np.sqrt(var + eps)
         dnorm[j] = d1 + d2
 
