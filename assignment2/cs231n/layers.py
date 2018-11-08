@@ -194,7 +194,7 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         norm = (x - mean) / np.sqrt(var + eps)
         out = gamma * norm + beta
 
-        cache = (x, norm, gamma, var, mean, eps)
+        cache = (x, gamma, eps)
 
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -246,33 +246,40 @@ def batchnorm_backward(dout, cache):
     # Referencing the original paper (https://arxiv.org/abs/1502.03167)       #
     # might prove to be helpful.                                              #
     ###########################################################################
-    (x, norm, gamma, var, mean, eps) = cache
+    (x, gamma, eps) = cache
+
+    mean = np.mean(x, axis=0)
+    var = np.mean((x - mean) ** 2, axis=0)
+    norm = (x - mean) / np.sqrt(var + eps)
+
     dgamma = np.sum(norm * dout, axis=0)
     dbeta = np.sum(dout, axis=0)
 
     N = x.shape[0]
-    dnx = np.zeros_like(x)
+    dnorm = np.zeros_like(x)
+
+    dmean = 1 / N
+
+    # dv = 0
+    # for i in range(N):
+    #     dv += 2 * (x[i] - mean) * (- dmean)
 
     for j in range(N):
-        dmean = np.ones_like(x[j]) / N
-        d1 = np.ones_like(x[j]) - dmean
-
-        s = 0
+        # dv += 2 * (x[j] - mean)
+        dv = 0
         for i in range(N):
             if i == j:
-                s += 2 * (x[i] - mean) * (1 - dmean)
+                dv += 2 * (x[i] - mean) * (1 - dmean)
             else:
-                s += 2 * (x[i] - mean) * (- dmean)
+                dv += 2 * (x[i] - mean) * (- dmean)
 
-        dvar = 1 / N * s
-        dnx[j] = (x[j] - mean) * (-1/(2 * np.power(var + eps, 3/2))) * dvar + d1 / (np.sqrt(var + eps))
+        dvar = dv / N
 
-    # dmean = np.ones_like(x) * ((N - 1) / N)
-    # dvar = 0
-    # dsq = 1 / (2 * sq) * dvar
-    # dnx = (x - mean) * (-1 / (2 * np.power(sq, 3/2)) * dsq) + (1 - dmean) / sq
+        d1 = (x[j] - mean) * (-1/(2 * np.power(var + eps, 3/2))) * dvar
+        d2 = (1 - dmean) / np.sqrt(var + eps)
+        dnorm[j] = d1 + d2
 
-    dx = gamma * dnx
+    dx = gamma * dnorm
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
