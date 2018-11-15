@@ -713,11 +713,34 @@ def max_pool_forward_naive(x, pool_param):
       W' = 1 + (W - pool_width) / stride
     - cache: (x, pool_param)
     """
-    out = None
     ###########################################################################
     # TODO: Implement the max-pooling forward pass                            #
     ###########################################################################
-    pass
+    (N, C, H, W) = x.shape
+    HH = pool_param['pool_width']
+    WW = pool_param['pool_height']
+    stride = pool_param['stride']
+
+    hout = 1 + (H - WW) // stride
+    wout = 1 + (W - HH) // stride
+    out = np.zeros((N, C, hout, wout))
+
+    for ni in range(N):
+        for ci in range(C):
+            hhh = 0
+            for hi in range(0, H - HH + 1, stride):
+                www = 0
+                for wi in range(0, W - WW + 1, stride):
+                    max_val = -np.inf
+                    for ph in range(hi, hi + HH):
+                        for pw in range(wi, wi + WW):
+                            if max_val < x[ni, ci, ph, pw]:
+                                max_val = x[ni, ci, ph, pw]
+
+                    out[ni, ci, hhh, www] = max_val
+                    www += 1
+                hhh += 1
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -736,11 +759,42 @@ def max_pool_backward_naive(dout, cache):
     Returns:
     - dx: Gradient with respect to x
     """
-    dx = None
+
     ###########################################################################
     # TODO: Implement the max-pooling backward pass                           #
     ###########################################################################
-    pass
+    (x, pool_param) = cache
+
+    (N, C, H, W) = x.shape
+    HH = pool_param['pool_width']
+    WW = pool_param['pool_height']
+    stride = pool_param['stride']
+
+    hout = 1 + (H - WW) // stride
+    wout = 1 + (W - HH) // stride
+    out = np.zeros((N, C, hout, wout))
+
+    dx = np.zeros_like(x)
+
+    for ni in range(N):
+        for ci in range(C):
+            hhh = 0
+            for hi in range(0, H - HH + 1, stride):
+                www = 0
+                for wi in range(0, W - WW + 1, stride):
+                    max_val = -np.inf
+                    max_index = None
+                    for ph in range(hi, hi + HH):
+                        for pw in range(wi, wi + WW):
+                            if max_val < x[ni, ci, ph, pw]:
+                                max_val = x[ni, ci, ph, pw]
+                                max_index = (ni, ci, ph, pw)
+
+                    dx[max_index] = dout[ni, ci, hhh, www]
+                    # out[ni, ci, hhh, www] = max_val
+                    www += 1
+                hhh += 1
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
