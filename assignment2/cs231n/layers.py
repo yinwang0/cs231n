@@ -656,8 +656,38 @@ def conv_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
+    (x, w, b, conv_param) = cache
+    (N, C, H, W) = x.shape
+    (F, C, HH, WW) = w.shape
+    stride = conv_param['stride']
+    pad = conv_param['pad']
+    H2 = 1 + (H + 2 * pad - HH) // stride
+    W2 = 1 + (W + 2 * pad - WW) // stride
 
+    db = np.zeros_like(b)
+    dx = np.zeros_like(x)
+    dw = np.zeros_like(w)
 
+    for ni in range(N):
+        hhh = 0
+        for hi in range(-pad, H + pad - HH + 1, stride):
+            www = 0
+            for wi in range(-pad, W + pad - WW + 1, stride):
+                for fi in range(F):
+                    # total = 0
+                    for ci in range(C):
+                        for hhi in range(HH):
+                            for wwi in range(WW):
+                                if 0 <= hi+hhi < H and 0 <= wi + wwi < W:
+                                    # total += x[ni, ci, hi+hhi, wi+wwi] * w[fi, ci, hhi, wwi]
+                                    dx[ni, ci, hi+hhi, wi+wwi] += w[fi, ci, hhi, wwi] * dout[ni, fi, hhh, www]
+                                    dw[fi, ci, hhi, wwi] += x[ni, ci, hi+hhi, wi+wwi] * dout[ni, fi, hhh, www]
+
+                    # out[ni, fi, hhh, www] = total + b[fi]
+                    db[fi] += dout[ni, fi, hhh, www]
+
+                www += 1
+            hhh += 1
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
