@@ -297,6 +297,11 @@ class FullyConnectedNet(object):
 
                 t2, cache2 = relu_forward(t1)
                 cache.append(cache2)
+
+                if self.use_dropout:
+                    t2, cache_dropout = dropout_forward(t2, self.dropout_param)
+                    cache.append(cache_dropout)
+
                 scores = t2
 
         ############################################################################
@@ -337,6 +342,10 @@ class FullyConnectedNet(object):
                 grads['W' + str(i)] = dw2 + (self.reg * Wi)
                 grads['b' + str(i)] = db2 + (self.reg * bi)
             else:
+                if self.use_dropout:
+                    cache_dropout = cache.pop()
+                    di = dropout_backward(di, cache_dropout)
+
                 cache2 = cache.pop()
                 di = relu_backward(di, cache2)
 
