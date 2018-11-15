@@ -198,13 +198,23 @@ class FullyConnectedNet(object):
         for i in range(self.num_layers):
             if i == 0:
                 self.params['W' + str(i)] = weight_scale * np.random.randn(input_dim, hidden_dims[0])
-                self.params['b' + str(i)] = np.zeros(hidden_dims[i])
+                self.params['b' + str(i)] = np.zeros(hidden_dims[0])
+
+                if self.normalization == 'batchnorm':
+                    self.params['gamma' + str(i)] = np.ones(hidden_dims[0])
+                    self.params['beta' + str(i)] = np.zeros(hidden_dims[0])
+
             elif i == self.num_layers - 1:
                 self.params['W' + str(i)] = weight_scale * np.random.randn(hidden_dims[i-1], num_classes)
                 self.params['b' + str(i)] = np.zeros(num_classes)
+
             else:
                 self.params['W' + str(i)] = weight_scale * np.random.randn(hidden_dims[i-1], hidden_dims[i])
                 self.params['b' + str(i)] = np.zeros(hidden_dims[i])
+
+                if self.normalization == 'batchnorm':
+                    self.params['gamma' + str(i)] = np.ones(hidden_dims[i])
+                    self.params['beta' + str(i)] = np.zeros(hidden_dims[i])
 
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -248,10 +258,10 @@ class FullyConnectedNet(object):
         # behave differently during training and testing.
         if self.use_dropout:
             self.dropout_param['mode'] = mode
+
         if self.normalization=='batchnorm':
             for bn_param in self.bn_params:
                 bn_param['mode'] = mode
-        scores = None
         ############################################################################
         # TODO: Implement the forward pass for the fully-connected net, computing  #
         # the class scores for X and storing them in the scores variable.          #
@@ -264,7 +274,6 @@ class FullyConnectedNet(object):
         # self.bn_params[1] to the forward pass for the second batch normalization #
         # layer, etc.                                                              #
         ############################################################################
-        N = X.shape[0]
         scores = X
         cache = []
 
@@ -278,8 +287,16 @@ class FullyConnectedNet(object):
                 scores = t1
             else:
                 t1, cache1 = affine_forward(scores, Wi, bi)
+                cache.append(cache1)
+
+                if self.normalization == "batchnorm":
+                    gamma = self.params['gamma' + str(i)]
+                    beta = self.params['beta' + str(i)]
+                    t1, cache_batch = batchnorm_forward(t1, gamma, beta, self.bn_params[i])
+                    cache.append(cache_batch)
+
                 t2, cache2 = relu_forward(t1)
-                cache.append((cache1, cache2))
+                cache.append(cache2)
                 scores = t2
 
         ############################################################################
@@ -310,18 +327,32 @@ class FullyConnectedNet(object):
         for i in reversed(range(self.num_layers)):
             Wi = self.params['W' + str(i)]
             bi = self.params['b' + str(i)]
+
             loss += self.reg * np.sum(Wi * Wi) * 0.5
             loss += self.reg * np.sum(bi * bi) * 0.5
 
             if i == self.num_layers - 1:
-                cache1 = cache[i]
+                cache1 = cache.pop()
                 di, dw2, db2 = affine_backward(di, cache1)
                 grads['W' + str(i)] = dw2 + (self.reg * Wi)
                 grads['b' + str(i)] = db2 + (self.reg * bi)
             else:
-                (cache1, cache2) = cache[i]
-                dx = relu_backward(di, cache2)
-                di, dw2, db2 = affine_backward(dx, cache1)
+                cache2 = cache.pop()
+                di = relu_backward(di, cache2)
+
+                if self.normalization == "batchnorm":
+                    gamma = self.params['gamma' + str(i)]
+                    beta = self.params['beta' + str(i)]
+                    loss += self.reg * np.sum(gamma * gamma) * 0.5
+                    loss += self.reg * np.sum(beta * beta) * 0.5
+
+                    cache_batch = cache.pop()
+                    di, dgamma, dbeta = batchnorm_backward(di, cache_batch)
+                    grads['gamma' + str(i)] = dgamma + (self.reg * gamma)
+                    grads['beta' + str(i)] = dbeta + (self.reg * beta)
+
+                cache1 = cache.pop()
+                di, dw2, db2 = affine_backward(di, cache1)
                 grads['W' + str(i)] = dw2 + (self.reg * Wi)
                 grads['b' + str(i)] = db2 + (self.reg * bi)
 

@@ -329,58 +329,35 @@ def batchnorm_backward(dout, cache):
     dbeta = np.sum(dout, axis=0)
 
     N = x.shape[0]
-    dnorm = np.zeros_like(x)
 
-    dmu = 1 / N
-
-    bn_param = {'mode': 'train'}
-    fv = lambda x: batchnorm_var(x, gamma, 0, bn_param)[0]
-    dv_num = eval_numerical_gradient_array(fv, x, dout)
-
-    dvars = np.zeros_like(x)
-
-    for j in range(N):
-        # dv2 = dv + 2 * (x[j] - mean)
-
-        total = 0
-        for k in range(N):
-            total += 2 * (x[k] - mu) * ((k == j) - dmu)
-
-        dvar = total / N
-        # dvar = dv_num[j]
-        dvars[j] = dvar
-
-        d1 = - 0.5 * (x[j] - mu) / (sq ** 3) * dvar
-        d2 = (1 - dmu) / sq
-        dnorm[j] = d1 + d2
-
-    dx = gamma * dout * dnorm
-
-    # dxhat = dout * gamma
-    # xhat = norm
-    # inv_var = 1 / np.sqrt(vare)
+    # Wrong! Can't caculate the gradient row by row
     #
-    # dx = (1. / N) * inv_var * (N * dxhat - np.sum(dxhat, axis=0)
-    #                            - xhat * np.sum(dxhat * xhat, axis=0))
+    # dnorm = np.zeros_like(x)
+    # dmu = 1 / N
+    #
+    # for j in range(N):
+    #     total = 0
+    #     for k in range(N):
+    #         total += 2 * (x[k] - mu) * ((k == j) - dmu)
+    #
+    #     dvar = total / N
+    #     d1 = - 0.5 * (x[j] - mu) / (sq ** 3) * dvar
+    #     d2 = (1 - dmu) / sq
+    #     dnorm[j] = d1 + d2
+    #
+    # dx = gamma * dout * dnorm
+
+    dxhat = gamma * dout
+    divar = np.sum(dxhat * (x - mu), axis=0)
+    dx1 = dxhat / sq - 1 / N * (x - mu) / (sq ** 3) * divar
+    dx2 = -1 / N * np.sum(dx1, axis=0)
+    dx = dx1 + dx2
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
 
-    # dnorm = gamma * dout
-    # divar = np.sum(dnorm * (x - mu), axis=0)
-    # dx1 = dnorm / np.sqrt(vare) - 1 / N * (x - mu) / np.power(vare, 1.5) * divar
-    # dx2 = -1 / N * np.sum(dx1, axis=0)
-    # dx = dx1 + dx2
-
-
-    # dnorm = gamma * dout
-    # divar = np.sum(dnorm * (x - mu), axis=0)
-    # dx1 = dnorm / np.sqrt(vare) - 1 / N * (x - mu) / np.power(vare, 1.5) * divar
-    # dx2 = -1 / N * np.sum(dx1, axis=0)
-    # dx = dx1 + dx2
-
-    return dx, dgamma, dbeta, dvars
+    return dx, dgamma, dbeta
 
 
 def batchnorm_backward_alt(dout, cache):
