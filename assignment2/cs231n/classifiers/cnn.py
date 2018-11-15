@@ -56,7 +56,7 @@ class ThreeLayerConvNet(object):
         (C, H, W) = input_dim
         F = num_filters
         HH, WW = filter_size, filter_size
-        hidden = F * C * H * W // 4
+        hidden = F * H * W // 4
 
         self.params['W1'] = np.random.randn(F, C, HH, WW) * weight_scale
         self.params['b1'] = np.zeros(F)
@@ -122,7 +122,7 @@ class ThreeLayerConvNet(object):
         if y is None:
             return scores
 
-        loss, grads = 0, {}
+        grads = {}
         ############################################################################
         # TODO: Implement the backward pass for the three-layer convolutional net, #
         # storing the loss and gradients in the loss and grads variables. Compute  #
