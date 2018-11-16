@@ -824,53 +824,18 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     - cache: Values needed for the backward pass
     """
 
-    # mode = bn_param['mode']
-    # eps = bn_param.get('eps', 1e-5)
-    # momentum = bn_param.get('momentum', 0.9)
-    #
-    # (N, C, H, W) = x.shape
-    # running_mean = bn_param.get('running_mean', np.zeros((N, C, H, W), dtype=x.dtype))
-    # running_var = bn_param.get('running_var', np.zeros((N, C, H, W), dtype=x.dtype))
-    #
-    # gamma1 = gamma[:, np.newaxis][:, np.newaxis]
-    # beta1 = beta[:, np.newaxis][:, np.newaxis]
-    # cache = None
-    #
-    # if mode == 'train':
-    #     mu = np.sum(x, axis=(0, 2, 3), keepdims=True) / (N * H * W)
-    #     var = np.sum((x - mu) ** 2, axis=(0, 2, 3), keepdims=True) / (N * H * W)
-    #     running_mean = momentum * running_mean + (1 - momentum) * mu
-    #     running_var = momentum * running_var + (1 - momentum) * var
-    #
-    #     norm = (x - mu) / np.sqrt(var + eps)
-    #     out = gamma1 * norm + beta1
-    #
-    #     cache = (x, gamma, eps)
-    #
-    # elif mode == 'test':
-    #     norm = (x - running_mean) / np.sqrt(running_var + eps)
-    #     out = gamma1 * norm + beta1
-    # else:
-    #     raise ValueError('Invalid forward batchnorm mode "%s"' % mode)
-    #
-    # # Store the updated running means back into bn_param
-    # bn_param['running_mean'] = running_mean
-    # bn_param['running_var'] = running_var
-
     (N, C, H, W) = x.shape
     x1 = np.rollaxis(x, 1).reshape(C, -1)
-    print(x1.shape)
     x1 = np.rollaxis(x1, 1)
-    print(x1.shape)
 
     out, cache = batchnorm_forward(x1, gamma, beta, bn_param)
-    out = np.rollaxis(out, 0, 1)
+    out = np.rollaxis(out, 0, 2)
     out = out.reshape((C, N, H, W))
 
-    out = np.rollaxis(out, 0, 1)
+    out = np.rollaxis(out, 0, 2)
 
-    eps = bn_param.get('eps', 1e-5)
-    cache = (x, gamma, eps)
+    # eps = bn_param.get('eps', 1e-5)
+    # cache = (x, gamma, eps)
     return out, cache
 
 
@@ -896,10 +861,14 @@ def spatial_batchnorm_backward(dout, cache):
     # vanilla version of batch normalization you implemented above.           #
     # Your implementation should be very short; ours is less than five lines. #
     ###########################################################################
-    pass
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
+    (N, C, H, W) = dout.shape
+    out1 = np.rollaxis(dout, 1).reshape(C, -1)
+    out1 = np.rollaxis(out1, 1)
+
+    dx, dgamma, dbeta = batchnorm_backward(out1, cache)
+    dx = np.rollaxis(dx, 0, 2)
+    dx = dx.reshape((C, N, H, W))
+    dx = np.rollaxis(dx, 0, 2)
 
     return dx, dgamma, dbeta
 
