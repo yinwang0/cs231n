@@ -106,6 +106,7 @@ class ThreeLayerConvNet(object):
         out, cache2 = max_pool_forward_fast(out, pool_param)
         out, cache3 = affine_relu_forward(out, W2, b2)
         out, cache4 = affine_forward(out, W3, b3)
+        scores = out
         loss, dout = softmax_loss(out, y)
 
         loss += self.reg * np.sum(W1 * W1) * 0.5
