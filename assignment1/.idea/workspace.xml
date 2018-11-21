@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="59574ffc-5aa0-4837-93c8-1300ce69436c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../assignment2/ConvolutionalNetworks.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/ConvolutionalNetworks.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../assignment2/cs231n/layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/cs231n/layers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assignment2/PyTorch.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/PyTorch.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assignment2/TensorFlow.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/TensorFlow.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -68,7 +70,7 @@
         <entry file="file://$PROJECT_DIR$/cs231n/classifiers/softmax.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="439">
-              <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="93" />
+              <caret line="93" selection-start-line="93" selection-end-line="93" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <marker date="1541494103815" expanded="true" signature="1975:1978" ph="..." />
@@ -81,7 +83,7 @@
         <entry file="file://$PROJECT_DIR$/cs231n/classifiers/neural_net.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="513">
-              <caret line="140" lean-forward="true" selection-start-line="140" selection-end-line="140" />
+              <caret line="140" selection-start-line="140" selection-end-line="140" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -227,7 +229,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="129" y="23" width="1400" height="1027" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24945612" />
@@ -292,7 +293,7 @@
     <entry file="file://$PROJECT_DIR$/cs231n/classifiers/softmax.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="439">
-          <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="93" />
+          <caret line="93" selection-start-line="93" selection-end-line="93" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
             <marker date="1541494103815" expanded="true" signature="1975:1978" ph="..." />
@@ -303,7 +304,7 @@
     <entry file="file://$PROJECT_DIR$/cs231n/classifiers/neural_net.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="513">
-          <caret line="140" lean-forward="true" selection-start-line="140" selection-end-line="140" />
+          <caret line="140" selection-start-line="140" selection-end-line="140" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
