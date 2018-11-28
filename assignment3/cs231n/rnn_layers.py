@@ -69,8 +69,7 @@ def rnn_step_backward(dnext_h, cache):
   # of the output value from tanh.                                             #
   ##############################################################################
   (prev_h, Wh, x, Wx, b, t1, t2, t3) = cache
-  c = np.cosh(t3)
-  d3 = dnext_h / (c * c)
+  d3 = dnext_h * dtanh(t3)
   dprev_h = d3.dot(Wh.T)
   dWh = prev_h.T.dot(d3)
   dx = d3.dot(Wx.T)
@@ -81,6 +80,11 @@ def rnn_step_backward(dnext_h, cache):
   #                               END OF YOUR CODE                             #
   ##############################################################################
   return dx, dprev_h, dWx, dWh, db
+
+
+def dtanh(x):
+  c = np.cosh(x)
+  return 1 / (c * c)
 
 
 def rnn_forward(x, h0, Wx, Wh, b):
@@ -262,6 +266,11 @@ def sigmoid(x):
   return top / (1 + z)
 
 
+def dsigmod(x):
+  y = sigmoid(x)
+  return y * (1 - y)
+
+
 def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
   """
   Forward pass for a single timestep of an LSTM.
@@ -282,12 +291,29 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
   - next_c: Next cell state, of shape (N, H)
   - cache: Tuple of values needed for backward pass.
   """
-  next_h, next_c, cache = None, None, None
   #############################################################################
   # TODO: Implement the forward pass for a single timestep of an LSTM.        #
   # You may want to use the numerically stable sigmoid implementation above.  #
   #############################################################################
-  pass
+  N, H = prev_h.shape
+  a = x.dot(Wx) + prev_h.dot(Wh) + b
+
+  ai = a[:, 0:H]
+  af = a[:, H:2*H]
+  ao = a[:, 2*H:3*H]
+  ag = a[:, 3*H:4*H]
+
+  i = sigmoid(ai)
+  f = sigmoid(af)
+  o = sigmoid(ao)
+  g = np.tanh(ag)
+
+  next_c = f * prev_c + i * g
+  tanh_next_c = np.tanh(next_c)
+  next_h = o * tanh_next_c
+
+  cache = (ai, af, ao, ag, i, f, o, g, prev_c, prev_h, tanh_next_c, Wx, Wh, x)
+
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################
@@ -319,7 +345,37 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   # HINT: For sigmoid and tanh you can compute local derivatives in terms of  #
   # the output value from the nonlinearity.                                   #
   #############################################################################
-  pass
+  N, H = dnext_h.shape
+  (ai, af, ao, ag, i, f, o, g, prev_c, prev_h, tanh_next_c, Wx, Wh, x) = cache
+
+  dtanh_next_c = dnext_h * o
+  dnext_c2 = dtanh_next_c * dtanh(dnext_c)
+  dnext_c_all = dnext_c + dnext_c2
+
+  df = dnext_c_all * prev_c
+  dprev_c = dnext_c_all * f
+  di = dnext_c_all * g
+  dg = dnext_c_all * i
+
+  do = dnext_h * tanh_next_c
+
+  dai = dsigmod(i) * di
+  daf = dsigmod(f) * df
+  dao = dsigmod(o) * do
+  dag = dtanh(g) * dg
+
+  da = np.zeros((N, 4*H))
+  da[:, 0:H] = dai
+  da[:, H:2*H] = daf
+  da[:, 2*H:3*H] = dao
+  da[:, 3*H:4*H] = dag
+
+  dx = np.dot(da, Wx.T)
+  dWx = np.dot(x.T, da)
+  dprev_h = np.dot(da, Wh.T)
+  dWh = np.dot(prev_h.T, da)
+  db = np.sum(da, axis=0)
+
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################
