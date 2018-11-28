@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="59574ffc-5aa0-4837-93c8-1300ce69436c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../assignment2/ConvolutionalNetworks.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/ConvolutionalNetworks.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../assignment2/PyTorch.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/PyTorch.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../assignment2/TensorFlow.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment2/TensorFlow.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assignment3/RNN_Captioning.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment3/RNN_Captioning.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assignment3/cs231n/classifiers/rnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment3/cs231n/classifiers/rnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../assignment3/cs231n/rnn_layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment3/cs231n/rnn_layers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -229,6 +229,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="129" y="23" width="1400" height="1027" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24945612" />
