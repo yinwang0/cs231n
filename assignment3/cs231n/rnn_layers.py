@@ -350,18 +350,20 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
 
   dtanh_next_c = dnext_h * o
   dnext_c2 = dtanh_next_c * dtanh(dnext_c)
-  dnext_c_all = dnext_c + dnext_c2
+  dc = dnext_c + dnext_c2
 
-  df = dnext_c_all * prev_c
-  dprev_c = dnext_c_all * f
-  di = dnext_c_all * g
-  dg = dnext_c_all * i
+  dprev_c = dc * f
+
+  di = dc * g
+  dai = dsigmod(i) * di
+
+  df = dc * prev_c
+  daf = dsigmod(f) * df
 
   do = dnext_h * tanh_next_c
-
-  dai = dsigmod(i) * di
-  daf = dsigmod(f) * df
   dao = dsigmod(o) * do
+
+  dg = dc * i
   dag = dtanh(g) * dg
 
   da = np.zeros((N, 4*H))
