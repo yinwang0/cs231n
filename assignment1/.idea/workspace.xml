@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="59574ffc-5aa0-4837-93c8-1300ce69436c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../assignment3/RNN_Captioning.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment3/RNN_Captioning.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../assignment3/cs231n/classifiers/rnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment3/cs231n/classifiers/rnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../assignment3/cs231n/rnn_layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../assignment3/cs231n/rnn_layers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
