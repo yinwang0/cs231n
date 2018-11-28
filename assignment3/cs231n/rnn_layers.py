@@ -338,7 +338,6 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   - dWh: Gradient of hidden-to-hidden weights, of shape (H, 4H)
   - db: Gradient of biases, of shape (4H,)
   """
-  dx, dh, dc, dWx, dWh, db = None, None, None, None, None, None
   #############################################################################
   # TODO: Implement the backward pass for a single timestep of an LSTM.       #
   #                                                                           #
@@ -355,16 +354,16 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   dprev_c = dc * f
 
   di = dc * g
-  dai = dsigmod(i) * di
+  dai = dsigmod(ai) * di
 
   df = dc * prev_c
-  daf = dsigmod(f) * df
+  daf = dsigmod(af) * df
 
   do = dnext_h * tanh_next_c
-  dao = dsigmod(o) * do
+  dao = dsigmod(ao) * do
 
   dg = dc * i
-  dag = dtanh(g) * dg
+  dag = dtanh(ag) * dg
 
   da = np.zeros((N, 4*H))
   da[:, 0:H] = dai
