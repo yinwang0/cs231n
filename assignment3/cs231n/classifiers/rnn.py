@@ -137,12 +137,22 @@ class CaptioningRNN(object):
     ############################################################################
     h0 = features.dot(W_proj) + b_proj
     t1, cache1 = word_embedding_forward(captions_in, W_embed)
-    t2, cache2 = rnn_forward(t1, h0, Wx, Wh, b)
+
+    if self.cell_type == 'rnn':
+      t2, cache2 = rnn_forward(t1, h0, Wx, Wh, b)
+    else:
+      t2, cache2 = lstm_forward(t1, h0, Wx, Wh, b)
+
     t3, cache3 = temporal_affine_forward(t2, W_vocab, b_vocab)
     loss, dout = temporal_softmax_loss(t3, captions_out, mask)
 
     dt3, grads['W_vocab'], grads['b_vocab'] = temporal_affine_backward(dout, cache3)
-    dt2, dh0, grads['Wx'], grads['Wh'], grads['b'] = rnn_backward(dt3, cache2)
+
+    if self.cell_type == 'rnn':
+      dt2, dh0, grads['Wx'], grads['Wh'], grads['b'] = rnn_backward(dt3, cache2)
+    else:
+      dt2, dh0, grads['Wx'], grads['Wh'], grads['b'] = lstm_backward(dt3, cache2)
+
     grads['W_embed'] = word_embedding_backward(dt2, cache1)
     grads['W_proj'] = features.T.dot(dh0)
     grads['b_proj'] = np.sum(dh0, axis=0)
@@ -213,10 +223,16 @@ class CaptioningRNN(object):
     init[:, 0] = self._start
 
     hidden = features.dot(W_proj) + b_proj
+    prev_c = np.zeros_like(hidden)
 
     for k in range(max_length):
       t1, _ = word_embedding_forward(init, W_embed)
-      hidden, _ = rnn_step_forward(t1[:, k, :], hidden, Wx, Wh, b)
+
+      if self.cell_type == 'rnn':
+        hidden, _ = rnn_step_forward(t1[:, k, :], hidden, Wx, Wh, b)
+      else:
+        hidden, prev_c, _ = lstm_step_forward(t1[:, k, :], hidden, prev_c, Wx, Wh, b)
+
       t3 = hidden.dot(W_vocab) + b_vocab
       init[:, k] = np.argmax(t3, axis=1)
 

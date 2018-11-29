@@ -409,17 +409,25 @@ def lstm_forward(x, h0, Wx, Wh, b):
   - h: Hidden states for all timesteps of all sequences, of shape (N, T, H)
   - cache: Values needed for the backward pass.
   """
-  h, cache = None, None
   #############################################################################
   # TODO: Implement the forward pass for an LSTM over an entire timeseries.   #
   # You should use the lstm_step_forward function that you just defined.      #
   #############################################################################
-  pass
-  ##############################################################################
-  #                               END OF YOUR CODE                             #
-  ##############################################################################
+  N, T, D = x.shape
+  N, H = h0.shape
 
-  return h, cache
+  hh = h0
+  cc = np.zeros_like(hh)
+
+  out = np.zeros((N, T, H))
+  cache = []
+
+  for k in range(x.shape[1]):
+    hh, cc, cache1 = lstm_step_forward(x[:, k, :], hh, cc, Wx, Wh, b)
+    out[:, k, :] = hh
+    cache.append(cache1)
+
+  return out, cache
 
 
 def lstm_backward(dh, cache):
@@ -437,16 +445,31 @@ def lstm_backward(dh, cache):
   - dWh: Gradient of hidden-to-hidden weight matrix of shape (H, 4H)
   - db: Gradient of biases, of shape (4H,)
   """
-  dx, dh0, dWx, dWh, db = None, None, None, None, None
   #############################################################################
   # TODO: Implement the backward pass for an LSTM over an entire timeseries.  #
   # You should use the lstm_step_backward function that you just defined.     #
   #############################################################################
-  pass
-  ##############################################################################
-  #                               END OF YOUR CODE                             #
-  ##############################################################################
-  
+  (x, prev_h, prev_c, next_c, Wx, Wh, b, ai, af, ao, ag, i, f, o, g) = cache[0]
+  N, T, H = dh.shape
+  N, D = x.shape
+
+  dx = np.zeros((N, T, D))
+  dprev_h = np.zeros((N, H))
+  dWx = np.zeros_like(Wx)
+  dWh = np.zeros_like(Wh)
+  db = np.zeros_like(b)
+
+  dprev_c = np.zeros_like(dh[:, 0, :])
+
+  for k in reversed(range(dh.shape[1])):
+    dxx, dprev_h, dprev_c, dWx1, dWh1, db1 = lstm_step_backward(dh[:, k, :] + dprev_h, dprev_c, cache[k])
+    dx[:, k, :] = dxx
+    dWx += dWx1
+    dWh += dWh1
+    db += db1
+
+  dh0 = dprev_h
+
   return dx, dh0, dWx, dWh, db
 
 
