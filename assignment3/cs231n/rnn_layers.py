@@ -83,8 +83,8 @@ def rnn_step_backward(dnext_h, cache):
 
 
 def dtanh(x):
-  c = np.cosh(x)
-  return 1 / (c * c)
+  c = np.tanh(x)
+  return 1 - c * c
 
 
 def rnn_forward(x, h0, Wx, Wh, b):
@@ -271,6 +271,10 @@ def dsigmod(x):
   return y * (1 - y)
 
 
+def dot(x, y):
+  return np.dot(x, y)
+
+
 def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
   """
   Forward pass for a single timestep of an LSTM.
@@ -296,7 +300,7 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
   # You may want to use the numerically stable sigmoid implementation above.  #
   #############################################################################
   N, H = prev_h.shape
-  a = x.dot(Wx) + prev_h.dot(Wh) + b
+  a = dot(x, Wx) + dot(prev_h, Wh) + b
 
   ai = a[:, 0:H]
   af = a[:, H:2*H]
@@ -309,10 +313,9 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
   g = np.tanh(ag)
 
   next_c = f * prev_c + i * g
-  tanh_next_c = np.tanh(next_c)
-  next_h = o * tanh_next_c
+  next_h = o * np.tanh(next_c)
 
-  cache = (ai, af, ao, ag, i, f, o, g, prev_c, prev_h, tanh_next_c, Wx, Wh, x)
+  cache = (x, prev_h, prev_c, next_c, Wx, Wh, b, ai, af, ao, ag, i, f, o, g)
 
   ##############################################################################
   #                               END OF YOUR CODE                             #
@@ -345,10 +348,10 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   # the output value from the nonlinearity.                                   #
   #############################################################################
   N, H = dnext_h.shape
-  (ai, af, ao, ag, i, f, o, g, prev_c, prev_h, tanh_next_c, Wx, Wh, x) = cache
+  (x, prev_h, prev_c, next_c, Wx, Wh, b, ai, af, ao, ag, i, f, o, g) = cache
 
   dtanh_next_c = dnext_h * o
-  dnext_c2 = dtanh_next_c * dtanh(dnext_c)
+  dnext_c2 = dtanh_next_c * dtanh(next_c)
   dc = dnext_c + dnext_c2
 
   dprev_c = dc * f
@@ -359,7 +362,7 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   df = dc * prev_c
   daf = dsigmod(af) * df
 
-  do = dnext_h * tanh_next_c
+  do = dnext_h * np.tanh(next_c)
   dao = dsigmod(ao) * do
 
   dg = dc * i
@@ -371,10 +374,10 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
   da[:, 2*H:3*H] = dao
   da[:, 3*H:4*H] = dag
 
-  dx = np.dot(da, Wx.T)
-  dWx = np.dot(x.T, da)
-  dprev_h = np.dot(da, Wh.T)
-  dWh = np.dot(prev_h.T, da)
+  dx = dot(da, Wx.T)
+  dWx = dot(x.T, da)
+  dprev_h = dot(da, Wh.T)
+  dWh = dot(prev_h.T, da)
   db = np.sum(da, axis=0)
 
   ##############################################################################
